@@ -1,10 +1,14 @@
+import gzip
 import jieba
 import markovify
 import random
 import botCache
 from botInfo import renew_rate
-from localDB import chat
 from diskIO import renew_model
+try:
+    from localDB import chat
+except ImportError:
+    from emptyLocalDB import chat
 
 
 punctuation_zh = ['，', '。', '？', '！']
@@ -65,7 +69,7 @@ def gen_sentence(model, space='English', retry_times=10):
         sentence = model.make_sentence()
         retry += 1
         if retry > retry_times:
-            return error_msg
+            return False
     if space == 'English':
         # English determination
         return format_out(sentence)
@@ -85,8 +89,8 @@ def gen_msg(chat_id, space='English', cache=False, retry_times=10):
         return sentence
     else:
         try:
-            with open(f'data/{chat_id}.txt', 'r', encoding='UTF-8') as f:
-                markov = markovify.Text(f)
+            with gzip.open(f'data/text/{chat_id}.gz', 'rb') as f:
+                markov = markovify.Text(f.read().decode('utf-8'))
                 sentence = gen_sentence(markov, space, retry_times)
             return sentence
 

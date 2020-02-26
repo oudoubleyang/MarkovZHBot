@@ -1,6 +1,6 @@
 from botSession import bot
-from markov import gen_msg
-from tools import get_chat_admin
+from mdMarkov import gen_msg
+from botTools import get_chat_admin
 from threading import Timer
 import botCache
 from mdStat import stat_receive, stat_send, read_stat

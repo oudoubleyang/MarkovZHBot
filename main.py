@@ -1,24 +1,24 @@
-from flask import Flask, request as flask_req
-from msgType import msg_type
+from telegram import Update
 from starting import starting
-import logging
+from botSession import markov, dp
 from diskIO import write_msg, write_stat
+from flask import Flask, request as flask_req
 
 
 app = Flask(__name__)
-
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
-
 starting()
 
 
 @app.route('/', methods=['POST'])
 def main():
-    data = flask_req.json
-    # print(data)
-    resp = msg_type(data)
+    update = Update.de_json(flask_req.json, markov)
+    dp.process_update(update)
     return '', 200
+
+
+@app.route('/', methods=['GET'])
+def status():
+    return '@MarkovZHBot is online.', 200
 
 
 @app.route('/write', methods=['GET'])
